@@ -15,10 +15,10 @@ output out, carryout;
 input a, b, carryin;
 wire axorb, axorbandcarryin, aandb;
 `XOR xorgate1(axorb, a, b); // xor gate produces axorb from a and b
-`XOR xorgate2(out, axorb, carryin); // xor gate produces out(sum) from axorb and carryin
+`XOR xorgate2(out, axorb, carryin); // 
 `AND andgate1(axorbandcarryin, axorb, carryin); // and gate produces axorbandcarryinn from axorb and carryin
 `AND andgate2(aandb, a, b);
-`OR orgate(carryout, axorbandcarryin, aandb);
+`OR orgate(carryout, axorbandcarryin, aandb); // or gate produces carryout from axorbandcarryin and aandb
 endmodule
 
 module FullAdder4bit
@@ -30,20 +30,21 @@ module FullAdder4bit
   input[3:0] b      // Second operand in 2's complement format
 );
   wire carryin = 0; // 0 is Carry in to the least significant bit
-  wire carryout0, carryout1, carryout2;
-  structuralFullAdder adder0 (sum[0], carryout0, a[0], b[0], carryin);
+  wire carryout0, carryout1, carryout2; // Wiring the four 1 bit adders together by assigning the previous carryout as the next carryin
+  structuralFullAdder adder0 (sum[0], carryout0, a[0], b[0], carryin); // Instantiate four of the 1 bit full adders
   structuralFullAdder adder1 (sum[1], carryout1, a[1], b[1], carryout0);
   structuralFullAdder adder2 (sum[2], carryout2, a[2], b[2], carryout1);
   structuralFullAdder adder3 (sum[3], carryout, a[3], b[3], carryout2);
-  `XOR xorgate(overflow, carryout2, carryout);
+  `XOR xorgate(overflow, carryout2, carryout); // xor gate produces overflow from carryout2(carryin to the most significant bit and carryout
 endmodule
 
 module test4bitFullAdder;
-reg[3:0] a, b;
+reg[3:0] a, b; // Initialize as buses corresponding to FullAdder4bit
 wire [3:0] sum;
 wire carryout, overflow;
-FullAdder4bit adder4bit(sum, carryout, overflow, a, b);
+FullAdder4bit adder4bit(sum, carryout, overflow, a, b); // Instantiate the 4 bit full adder with overflow
 initial begin
+// 18 Test Cases
 $display("Test Adder 0 Pos:");
 $display("a     b    | sum    carryout   overflow| Expected Output");
 a=4'b0000;b=4'b0001; #1000
