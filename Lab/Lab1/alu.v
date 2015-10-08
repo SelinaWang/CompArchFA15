@@ -48,7 +48,13 @@ module adderSubtractor32bit
   wire carryin = 0; // 0 is Carry in to the least significant bit
   wire carryout0, carryout1, carryout2; // Wiring the four 1 bit adders together by assigning the previous carryout as the next carryin
   wire bafter[31:0],
- `XOR xorgate1(bafter[31:0], s, b[31:0]) 
+
+  generate
+  genvar index;
+  for (index=0; index<32; index = index+1) begin
+	`XOR xorgate1(bafter[index], s, b[index]);
+  end
+  endgenerate
   structuralFullAdder adder0 (sum[0], carryout0, a[0], bafter[0], carryin); // Instantiate four of the 1 bit full adders
   structuralFullAdder adder1 (sum[1], carryout1, a[1], bafter[1], carryout0);
   structuralFullAdder adder2 (sum[2], carryout2, a[2], bafter[2], carryout1);
@@ -56,9 +62,32 @@ module adderSubtractor32bit
   `XOR xorgate(overflow, carryout2, carryout); // xor gate produces overflow from carryout2(carryin to the most significant bit and carryout
 endmodule
 
+module xormodule
+  input [31:0] a,
+  input[31:0] b, 
+  output [31:0] out  
+   
+generate
+genvar index; 
+ for (index=0; index<32; index = index+1) begin
+	`XOR xorgate1(out[index], a[index], b[index]);
+end
+endgenerate
+endmodule
 
 
 
+module ornor
+(
+  output out,
+  input [31:0] a,
+  input [31:0] b,
+  input n
+);
+ wire bafter[31:0],
+`NOR norgate(bafter[31:0], n, b[31:0])
+
+endmodule
 
 
 module structuralALU(ctl, a, b, result, zero);
