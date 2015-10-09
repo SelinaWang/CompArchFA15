@@ -1,0 +1,36 @@
+Computer Architecture Lab 1: Arithmetic Logic Unit
+
+Selina Wang, William Saulnier, Brenna Manning
+
+Verilog
+Adder  -30min (Done by Thurs 10/8)
+Subtractor - 45min (Done by Thurs 10/8)
+XOR- 30min (Done by Thurs 10/8)
+SLT- 60min (Done by Fri 10/9)
+AND -20min (Done by Fri 10/9)
+NOR - 20min (Done by Fri 10/9)
+Nand - 20min (Done by Fri 10/9)
+Total: 245min ~ 4hrs
+
+
+Gate Delays - 20min (Done by Sun)
+
+*Look Up Table - 30min Optional* Plan to complete  (Tues 10/13)
+
+
+Test Benches
+Adder -30min (Done by Fri 10/9)
+Subtractor -30min (Done by Fri 10/9)
+XOR - 30min (Done by Fri 10/9)
+SLT - 30min (Done by Fri 10/9)
+AND - 30min (Done by Sun 10/11)
+OR - 30min  (Done by Sun 10/11)
+NOR - 30min (Done by Sun 10/11
+NAND -30min (Done by Sun 10/11)
+
+Total: 240min 4 hours
+
+ Write Up & Reflection ~2hrs (Tues 10/13)
+
+
+ Overall Total: ~10+hrs
