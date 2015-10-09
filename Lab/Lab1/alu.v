@@ -1,5 +1,4 @@
 //define gate delays
-
 `define ADD  3'd0 #50
 `define SUB  3'd1 #50
 `define XOR  xor 3'd2 #50
@@ -8,7 +7,6 @@
 `define NAND nand 3'd5 #50
 `define NOR  nor 3'd6 #50
 `define OR  or 3'd7 #50
-
 
 
 module ALU(ctl, a, b, result, zero);
@@ -34,8 +32,6 @@ wire axorb, axorbandcarryin, aandb;
 `OR orgate(carryout, axorbandcarryin, aandb); // or gate produces carryout from axorbandcarryin and aandb
 endmodule
 
-
-
 module adderSubtractor32bit
 (
   output[31:0] sum,  // 2's complement sum of a and b
@@ -46,8 +42,8 @@ module adderSubtractor32bit
   input s 	   //subtractor enable
 );
   wire carryin = 0; // 0 is Carry in to the least significant bit
-  wire carryout0, carryout1, carryout2; // Wiring the four 1 bit adders together by assigning the previous carryout as the next carryin
-  wire bafter[31:0],
+  wire co[31:0]; // Wiring the 32 1 bit adders together by assigning the previous carryout as the next carryin
+  wire bafter[31:0];
 
   generate
   genvar index;
@@ -55,50 +51,96 @@ module adderSubtractor32bit
 	`XOR xorgate1(bafter[index], s, b[index]);
   end
   endgenerate
-  structuralFullAdder adder0 (sum[0], carryout0, a[0], bafter[0], carryin); // Instantiate four of the 1 bit full adders
-  structuralFullAdder adder1 (sum[1], carryout1, a[1], bafter[1], carryout0);
-  structuralFullAdder adder2 (sum[2], carryout2, a[2], bafter[2], carryout1);
-  structuralFullAdder adder3 (sum[3], carryout, a[3], bafter[3], carryout2);
-  `XOR xorgate(overflow, carryout2, carryout); // xor gate produces overflow from carryout2(carryin to the most significant bit and carryout
+
+  structuralFullAdder adder0 (sum[0], co[0], a[0], bafter[0], carryin); // Instantiate the first 1 bit full adders
+  generate
+  genvar index;
+  for (index=1; index<31; index = index+1) begin
+  structuralFullAdder adder (sum[index], co[index], a[index], bafter[index], co[index-1]); // Instantiate the middle 30 1 bit full adders
+  endgenerate
+  structuralFullAdder adderlast (sum[31], carryout, a[31], bafter[31], co[30]); // Instantiate the last 1 bit full adders
+  `XOR xorgate(overflow, co[30], carryout); // xor gate produces overflow from carryout2(carryin to the most significant bit and carryout
 endmodule
 
+module setlessthan
+(
+  input[31:0] a,     // First operand in 2's complement format
+  input[31:0] b,      // Second operand in 2's complement format
+);
+  wire sum[31:0];
+  adderSubtrctor32bit subtrctor (sum[31:0], carryout, overflow, a[31:0], b[31:0], 1); // Instantiate the subtrctor
+  
+endmodule
+
+
 module xormodule
-  input [31:0] a,
-  input[31:0] b, 
-  output [31:0] out  
-   
+(
+  input [31:0] a;
+  input[31:0] b; 
+  output [31:0] out;  
+);
 generate
 genvar index; 
  for (index=0; index<32; index = index+1) begin
-	`XOR xorgate1(out[index], a[index], b[index]);
+	`XOR xorgate(out[index], a[index], b[index]);
 end
 endgenerate
 endmodule
 
-
-
-module ornor
+module andmodule
 (
-  output out,
-  input [31:0] a,
-  input [31:0] b,
-  input n
+  input [31:0] a;
+  input[31:0] b;
+  output [31:0] out;  
 );
- wire bafter[31:0],
-`NOR norgate(bafter[31:0], n, b[31:0])
-
+generate
+genvar index; 
+ for (index=0; index<32; index = index+1) begin
+	`AND andgate(out[index], a[index], b[index]);
+end
+endgenerate
 endmodule
 
-
-module structuralALU(ctl, a, b, result, zero);
-output result, zero;
-input ctl, a, b;
-wire 
+module nandmodule
+(
+  input [31:0] a,
+  input[31:0] b, 
+  output [31:0] out  
+);
+generate
+genvar index; 
+ for (index=0; index<32; index = index+1) begin
+	`NAND nandgate(out[index], a[index], b[index]);
+end
+endgenerate
 endmodule
 
+module normodule
+(
+  input [31:0] a,
+  input[31:0] b, 
+  output [31:0] out  
+);
+generate
+genvar index; 
+ for (index=0; index<32; index = index+1) begin
+	`NOR norgate(out[index], a[index], b[index]);
+end
+endgenerate
+endmodule
 
-module ALU32bit
-
+module ormodule
+(
+  input [31:0] a,
+  input[31:0] b, 
+  output [31:0] out  
+);
+generate
+genvar index; 
+ for (index=0; index<32; index = index+1) begin
+	`OR orgate(out[index], a[index], b[index]);
+end
+endgenerate
 endmodule
 
 module ALUcontrolLUT
@@ -122,4 +164,5 @@ input[2:0]  ALUcommand
       `OR:   begin muxindex = ?; invertB=?; othercontrolsignal = ?; end
     endcase
   end
+endmodule
 endmodule
