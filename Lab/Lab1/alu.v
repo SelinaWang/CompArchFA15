@@ -66,9 +66,30 @@ module setlessthan
 (
   input[31:0] a,     // First operand in 2's complement format
   input[31:0] b,      // Second operand in 2's complement format
+  input s;
 );
   wire sum[31:0];
-  adderSubtrctor32bit subtrctor (sum[31:0], carryout, overflow, a[31:0], b[31:0], 1); // Instantiate the subtrctor
+  wire isLessThan[31:0];
+
+  generate
+  genvar index;
+  for (index=0; index<32; index = index +1) begin
+	`SLT sltgate(isLessThan[index], a[index], b[index])
+  end
+  endgenerate
+
+  // subtractor outputs: sum carryout overflow, inputs: a, b, s
+  //adderSubtrctor32bit subtractor (sum[31:0], carryout, overflow, a[31:0], b[31:0], 1); // Instantiate the subtrctor
+  adderSubtrctor32bit subtractor0 (sum[0], carryout[0], overflow, a[31:0], b[31:0], 1); // Instantiate the subtrctor
+  
+  generate
+  genvar index;
+  for (index=1; index<31; index = index+1) begin
+  	adderSubtrctor32bit subtractor (sum[index], carryout, overflow, a[index], b[index], 1); 
+	
+  if (sum[index] < 0)  //Still trying to figure out how to do this part. 
+	isLessThan[index] = 1;
+  end
   
 endmodule
 
