@@ -87,8 +87,8 @@ module setlessthan
   for (index=1; index<31; index = index+1) begin
   	adderSubtrctor32bit subtractor (sum[index], carryout, overflow, a[index], b[index], 1); 
 	
-  if (sum[index] < 0)  //Still trying to figure out how to do this part. 
-	isLessThan[index] = 1;
+  isLessThan[0] = sum[31];
+
   end
   
 endmodule
