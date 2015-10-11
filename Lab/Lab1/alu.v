@@ -57,6 +57,7 @@ module adderSubtractor32bit
   genvar index;
   for (index=1; index<31; index = index+1) begin
   structuralFullAdder adder (sum[index], co[index], a[index], bafter[index], co[index-1]); // Instantiate the middle 30 1 bit full adders
+  end
   endgenerate
   structuralFullAdder adderlast (sum[31], carryout, a[31], bafter[31], co[30]); // Instantiate the last 1 bit full adders
   `XOR xorgate(overflow, co[30], carryout); // xor gate produces overflow from carryout2(carryin to the most significant bit and carryout
@@ -64,17 +65,20 @@ endmodule
 
 module setlessthan
 (
+  output isLessThan [31:0],
   input[31:0] a,     // First operand in 2's complement format
   input[31:0] b,      // Second operand in 2's complement format
   input s;
 );
-  wire sum[31:0];
-  wire isLessThan[31:0];
-
+  wire sum[31:0,
+  wire carryout[31:0], 
+  wire overflow[31:0],
+  wire bafter[31:0];
+  
   generate
   genvar index;
   for (index=0; index<32; index = index +1) begin
-	`SLT sltgate(isLessThan[index], a[index], b[index])
+	`SLT sltgate(isLessThan[index], a[index], b[index], s)
   end
   endgenerate
 
@@ -88,6 +92,7 @@ module setlessthan
   	adderSubtrctor32bit subtractor (sum[index], carryout, overflow, a[index], b[index], 1); 
 	
   isLessThan[0] = sum[31];
+  isLessThan[1:31] = 0;
 
   end
   
