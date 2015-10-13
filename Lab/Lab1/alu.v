@@ -1,15 +1,23 @@
 //define gate delays
-`define ADD  3'd0 #50
-`define SUB  3'd1 #50
-`define XOR  3'd2 #50
-`define SLT  3'd3 #50
-`define AND  3'd4 #50
-`define NAND 3'd5 #50
-`define NOR  3'd6 #50
-`define OR   3'd7 #50
+`define AND and #20
+`define OR or #20
+`define NOT not #10
+`define NOR nor #10
+`define NAND nand #10
+`define XOR xor #30
+
+//define operations
+`define ADD  3'd0 
+`define SUB  3'd1 
+`define XOR  3'd2 
+`define SLT  3'd3 
+`define AND  3'd4 
+`define NAND 3'd5 
+`define NOR  3'd6 
+`define OR   3'd7 
 
 
-module ALU(ctl, a, b, result, zero);
+module ALU(addr, a, b, result, carryout, overflow, zero);
 (
 output[31:0]    result, 
 output          carryout,
@@ -103,91 +111,106 @@ module adderSubtractor32bit
   `XOR xorgate(overflow, co[30], carryout); // xor gate produces overflow from carryout2(carryin to the most significant bit and carryout
 endmodule
 
-module setlessthan
-(
-  input[31:0] a,     // First operand in 2's complement format
-  input[31:0] b,      // Second operand in 2's complement format
-  output[31:0] slt
-);
-  wire sum[31:0];
-  adderSubtrctor32bit subtractor (sum[31:0], carryout, overflow, a[31:0], b[31:0], 1); // Instantiate the subtrctor
-  slt[0] = sum[31]; // set the LSB to be the MSB of the output from the subtractor
-  generate
-  genvar index;
-  for (index=1; index<31; index = index+1) begin
-  slt[index] = 0; // set the rest of the 32 bit number to be 0
-  endgenerate
+//module setlessthan
+//(
+//  input[31:0] a,     // First operand in 2's complement format
+//  input[31:0] b,      // Second operand in 2's complement format
+//  output[31:0] slt
+//);
+//  wire sum[31:0];
+//  adderSubtrctor32bit subtractor (sum[31:0], carryout, overflow, a[31:0], b[31:0], 1); // Instantiate the subtrctor
+//  slt[0] = sum[31]; // set the LSB to be the MSB of the output from the subtractor
+//  generate
+//  genvar index;
+//  for (index=1; index<31; index = index+1) begin
+//  slt[index] = 0; // set the rest of the 32 bit number to be 0
+//  endgenerate
+//endmodule
+
+//////
+module setlessthanmodule(sum, overflow, sltout);
+//Outputs a single bit (1 if input a is less than input b)
+input[31:0] sum;
+input overflow;
+output sltout;
+//XOR Overflow and SumMSB output from 32bitAdder/Subtractor
+//If a < b: If no overflow, msb of sum = 1 If overflow, msb of sum will = 0
+`XOR xorgate_slt(sltout, sum[31], overflow);
+//Note: No generate needed for SLT because only 1 bit matters in each! (Output also 1 bit true/fasle)
 endmodule
 
 
-module xormodule
-(
-  input [31:0] a;
-  input[31:0] b; 
-  output [31:0] out;  
-);
-generate
-genvar index; 
- for (index=0; index<32; index = index+1) begin
-	`XOR xorgate(out[index], a[index], b[index]);
-end
-endgenerate
-endmodule
-
-module andmodule
-(
-  input [31:0] a;
-  input[31:0] b;
-  output [31:0] out;  
-);
-generate
-genvar index; 
- for (index=0; index<32; index = index+1) begin
-	`AND andgate(out[index], a[index], b[index]);
-end
-endgenerate
-endmodule
-
-module nandmodule
-(
-  input [31:0] a,
-  input[31:0] b, 
+module xormodule(a, b, out);
+  input wire [31:0] a,
+  input wire[31:0] b, 
   output [31:0] out  
-);
-generate
+   
+generate //generate 32 XOR gates to xor all 32 bits of a and b
 genvar index; 
- for (index=0; index<32; index = index+1) begin
-	`NAND nandgate(out[index], a[index], b[index]);
-end
+ for (index=0; index<32; index = index+1) 
+	begin: xorgen
+		`XOR xorgate1(out[index], a[index], b[index]);
+	end
 endgenerate
 endmodule
 
-module normodule
-(
-  input [31:0] a,
-  input[31:0] b, 
-  output [31:0] out  
-);
-generate
-genvar index; 
- for (index=0; index<32; index = index+1) begin
-	`NOR norgate(out[index], a[index], b[index]);
-end
+module andmodule(a, b, out); //out=1 if a=1 and b=1, else out = 0
+output[31:0] out;
+input[31:0] a;
+input[31:0] b;
+
+//becomes NOR gate if the inputs a and b are both inverted (?)
+
+generate //generate 32 AND gate to compare all 32 bits of a and b 
+genvar index;
+for (index = 0; index<32; index = index + 1)
+	begin: andgen
+		`AND andgate(out[index], a[index], b[index]); 
+	end
 endgenerate
 endmodule
 
-module ormodule
-(
-  input [31:0] a,
-  input[31:0] b, 
-  output [31:0] out  
-);
-generate
-genvar index; 
- for (index=0; index<32; index = index+1) begin
-	`OR orgate(out[index], a[index], b[index]);
-end
+module ormodule(a, b, out);
+output[31:0] out;
+input[31:0] a;
+input [31:0] b;
+
+//becomes NAND gate if a and b are both inverted (?)
+
+generate //generate 32 OR gates to or all32 bits of a and b
+genvar index;
+for (index = 0; index<32; index = index + 1)
+	begin: orgen
+		`OR orgate(out[index], a[index], b[index]);
+	end
 endgenerate
 endmodule
 
-endmodule
+//module nandmodule
+//(
+//  input [31:0] a,
+//  input[31:0] b, 
+//  output [31:0] out  
+//);
+//generate
+//genvar index; 
+// for (index=0; index<32; index = index+1) begin
+//	`NAND nandgate(out[index], a[index], b[index]);
+//end
+//endgenerate
+//endmodule
+
+//module normodule
+//(
+//  input [31:0] a,
+//  input[31:0] b, 
+//  output [31:0] out  
+//);
+//generate
+//genvar index; 
+// for (index=0; index<32; index = index+1) begin
+//	`NOR norgate(out[index], a[index], b[index]);
+//end
+//endgenerate
+//endmodule
+
