@@ -7,14 +7,14 @@
 `define XOR xor #30
 
 //define operations
-`define ADD_Op  3'd0 
-`define SUB_Op  3'd1 
-`define XOR_Op  3'd2 
-`define SLT_Op  3'd3 
-`define AND_Op  3'd4 
-`define NAND_Op 3'd5 
-`define NOR_Op  3'd6 
-`define OR_Op   3'd7 
+`define ADD_OP  3'd0 
+`define SUB_OP  3'd1 
+`define XOR_OP  3'd2 
+`define SLT_OP  3'd3 
+`define AND_OP  3'd4 
+`define NAND_OP 3'd5 
+`define NOR_OP  3'd6 
+`define OR_OP   3'd7 
 
 
 module ALU(addr, a, b, result, carryout, overflow, zero);
@@ -31,28 +31,39 @@ input[2:0]      command
 module ALUcontrolLUT
 (
 output reg[2:0] muxindex,
-output reg  s,
-output reg  othercontrolsignal,
+output reg  inv_a,
+output reg  inv_b,
 input[2:0]  ALUcommand
 )
 
   always @(ALUcommand) begin
     case (ALUcommand)
-      `ADD:  begin muxindex = 0; s=0; othercontrolsignal = 0; end    
-      `SUB:  begin muxindex = 0; s=1; othercontrolsignal = 1; end
-      `XOR:  begin muxindex = 1; s=0; othercontrolsignal = 0; end    
-      `SLT:  begin muxindex = 2; s=1; othercontrolsignal = 0; end
-      `AND:  begin muxindex = 3; s=0; othercontrolsignal = 0; end    
-      `NAND: begin muxindex = 3; s=0; othercontrolsignal = 1; end
-      `NOR:  begin muxindex = 4; s=0; othercontrolsignal = 0; end    
-      `OR:   begin muxindex = 4; s=0; othercontrolsignal = 1; end
+      `ADD_OP:  begin muxindex = 0; inv_b=0; inv_a = 0; end    
+      `SUB_OP:  begin muxindex = 0; inv_b=1; inv_a = 0; end
+      `XOR_OP:  begin muxindex = 1; inv_b=0; inv_a = 0; end    
+      `SLT_OP:  begin muxindex = 2; inv_b=1; inv_a = 0; end
+      `AND_OP:  begin muxindex = 3; inv_b=0; inv_a = 0; end
+      `NOR_OP:  begin muxindex = 3; inv_b=1; inv_a = 1; end    
+      `NAND_OP: begin muxindex = 4; inv_b=1; inv_a = 1; end    
+      `OR_OP:   begin muxindex = 4; inv_b=0; inv_a = 0; end
     endcase
   end
 endmodule
 
-
-
 //Different Structural Mux with Generate?
+
+module 
+(
+input[2:0] muxindex
+input inv_a,
+input inv_b,
+input[31:0] addsub_in,
+input[31:0] xor_in, 
+input[31:0] andnor_in, 
+input[31:0] ornand_in,
+input slt_in, 
+output[31:0] Output,
+);
 
 
 
