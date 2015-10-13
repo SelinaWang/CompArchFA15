@@ -7,14 +7,14 @@
 `define XOR xor #30
 
 //define operations
-`define ADD  3'd0 
-`define SUB  3'd1 
-`define XOR  3'd2 
-`define SLT  3'd3 
-`define AND  3'd4 
-`define NAND 3'd5 
-`define NOR  3'd6 
-`define OR   3'd7 
+`define ADD_Op  3'd0 
+`define SUB_Op  3'd1 
+`define XOR_Op  3'd2 
+`define SLT_Op  3'd3 
+`define AND_Op  3'd4 
+`define NAND_Op 3'd5 
+`define NOR_Op  3'd6 
+`define OR_Op   3'd7 
 
 
 module ALU(addr, a, b, result, carryout, overflow, zero);
@@ -50,6 +50,53 @@ input[2:0]  ALUcommand
   end
 endmodule
 
+
+
+//Different Structural Mux with Generate?
+
+
+
+module structuralmux(out, command, andnor_in, ornand_in, xor_in, addsub_in, slt_in) 
+//INPUTS: "(gate)_in" = output of operations, "command" = address -> which op to perform
+//OUTPUT: "out" = result of selected op
+output[31:0] out;
+input[2:0] command; //3bit command address
+input[31:0] andnor_in; //result of and/nor operation
+input[31:0] ornand_in; //result of or/nand operation
+input[31:0] xor_in; //result of xor operation
+input[31:0] addsub_in; //result of add/sub operation
+input slt_in; //result of set less than operation
+
+wire[2:0] inv)command; //3 bits: are the inputs inversed? EX to make AND gate a NOR gate, etc.
+wire[31:0] andnor_enable;
+wire[31:0] ornand_enable;
+wire[31:0] xor_enable;
+wire[31:0] addsub_enable;
+wire slt_enable;
+//only one of the gate enables should be true - determined by command input
+
+//determine what is enabled  /
+`NOT not0(inv_command[0], command[0]);
+`NOT not1(inv_command[1], command[1]);
+`NOT not2(inv_command[2], command[2]);
+`AND andgate_slt(slt_enable, slt_in, inv_command[2], command[1], inv_command[0]);
+
+generate
+genvar index;
+for (index = 0; index<32; index = index + 1)
+	begin: muxgen
+		`AND andgate_andnor(andnor_enable[index], andnor_in[index], inv_command[2], command[1], command[0[); 
+		`AND andgate_ornand(ornand_enable[index], ornand_in[index], command[2] inv_command[1], inv_command[0]);
+		`AND andgate_xor(xor_enable[index], xor_in[index], inv_command[2], inv_command[[1], command[0]);
+		`AND andgate_addsub(addsub_enable[index], addsub_in[index], inv_command[2[, inv_command[1], inv_command[0]); 
+		`OR  orgate3(out[index], andnor_enable[index], ornand_enable[index], xor_enable[index], addsub_enable[index], slt_enable);
+	end
+endgenerate
+end module
+
+///////////////////////////
+
+
 module structuralMultiplexer(out, address0,address1, address2,in0,in1,in2,in3,in4,in5,in6,in7);
 output out;
 input address0, address1, address2;
@@ -77,7 +124,7 @@ wire axorb, axorbandcarryin, aandb;
 `XOR xorgate2(out, axorb, carryin); // 
 `AND andgate1(axorbandcarryin, axorb, carryin); // and gate produces axorbandcarryinn from axorb and carryin
 `AND andgate2(aandb, a, b);
-`OR orgate(carryout, axorbandcarryin, aandb); // or gate produces carryout from axorbandcarryin and aandb
+`OR orgate1 carryout, axorbandcarryin, aandb); // or gate produces carryout from axorbandcarryin and aandb
 endmodule
 
 module adderSubtractor32bit
@@ -181,7 +228,7 @@ generate //generate 32 OR gates to or all32 bits of a and b
 genvar index;
 for (index = 0; index<32; index = index + 1)
 	begin: orgen
-		`OR orgate(out[index], a[index], b[index]);
+		`OR orgate2(out[index], a[index], b[index]);
 	end
 endgenerate
 endmodule
