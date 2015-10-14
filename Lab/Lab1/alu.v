@@ -152,6 +152,12 @@ module ALUcontrolLUT
         //XOR Overflow and SumMSB output from 32bitAdder/Subtractor
         //If a < b: If no overflow, msb of sum = 1 If overflow, msb of sum will = 0
         `XOR xorgate_slt(sltout[0], sum[31], overflow);
+	genvar index;
+	generate
+	for (index = 1; index < 32; index = index + 1) begin: zeroPadGenerate
+		assign sltout[index] = 0;
+	end
+	endgenerate
         //Note: No generate needed for SLT because only 1 bit matters in each! (Output also 1 bit true/false)
     endmodule
 
@@ -223,6 +229,14 @@ input[2:0]      command
     wire inv_b;
     wire[2:0] muxindex;
     ALUcontrolLUT ourLut (muxindex, inv_a, inv_b, command);
+
+    wire[2:0] invertedMuxIndex;
+    genvar index3;
+    generate
+    for (index3 = 0; index3 < 3; index3 = index3 + 1) begin: invertMuxGen
+        `NOT invertMuxIndexGate(invertedMuxIndex[index3], muxindex[index3]);
+    end
+    endgenerate
 
     // set up input inverters
     wire[31:0] inputA, inputB;
