@@ -15,19 +15,7 @@
 `define NAND_OP 3'd5
 `define NOR_OP  3'd6
 `define OR_OP   3'd7
-
-module ALU(addr, a, b, result, carryout, overflow, zero);
-(
-output[31:0]    result,
-output          carryout,
-output          zero,
-output          overflow,
-input[31:0]     operandA,//a,b
-input[31:0]     operandB,//a,b
-input[2:0]      command
-);
-
-    module ALUcontrolLUT
+module ALUcontrolLUT
     (
     output reg[2:0] muxindex,
     output reg  inv_a,
@@ -59,20 +47,20 @@ input[2:0]      command
         wire[31:0] notInput;
         wire[31:0] invertedSignal;
         `NOT invertInverterSignal(doNotInvertSignal, invertSignal);
-
+	genvar index;
         generate
-        genvar index;
-        for (index = 0; index<32; index = index + 1)
-            `AND checkNotInvert(notInvertedSignal[index], Input[index], doNotInvertSignal);
-            `NOT invertInput(notInput[index], Input[index]);
-            `AND checkInvert(invertedSignal[index], notInput[index], invertSignal) ;
-            `OR outputSwitch(Output[index], invertedSignal[index], notInvertedSignal[index]);
+	        for (index = 0; index<32; index = index + 1) begin: inverterGen
+	            `AND checkNotInvert(notInvertedSignal[index], Input[index], doNotInvertSignal);
+	            `NOT invertInput(notInput[index], Input[index]);
+	            `AND checkInvert(invertedSignal[index], notInput[index], invertSignal) ;
+	            `OR outputSwitch(Output[index], invertedSignal[index], notInvertedSignal[index]);
+		end
         endgenerate
     endmodule
 
     module muxer
     (
-    out[31:0] result,
+    output[31:0] result,
     input[2:0] muxindex,
     input[31:0] adderOutput,
     input[31:0] xorOutput,
@@ -104,29 +92,33 @@ input[2:0]      command
         `AND checkEnableAnd(enableAnd, muxindex[0], muxindex[1], invertedMuxIndex[2]);
         `AND checkEnableOr(enableOr, invertedMuxIndex[0], invertedMuxIndex[1], muxindex[2]);
 
+	genvar index2;
         generate
-        genvar index;
-        for (index = 0; index < 32; index = index + 1)
-            `AND checkIfAdder(isAdder[index], adderOutput[index], enableAdder);
-            `AND checkIfXor(isXor[index], xorOutput[index], enableXor);
-            `AND checkIfSLT(isSLT[index], sltOutput[index], enableSLT);
-            `AND checkIfAnd(isAnd[index], andOutput[index], enableAnd);
-            `AND checkIfOr(isOr[index], orOutput[index], enableOr);
-            `OR finalOutput(result[index], isAdder[index], isXor[index], isSLT[index], isAnd[index], isOr[index]);
+        for (index2 = 0; index2 < 32; index2 = index2 + 1) begin: muxGenerate
+            `AND checkIfAdder(isAdder[index2], adderOutput[index2], enableAdder);
+            `AND checkIfXor(isXor[index2], xorOutput[index2], enableXor);
+            `AND checkIfSLT(isSLT[index2], sltOutput[index2], enableSLT);
+            `AND checkIfAnd(isAnd[index2], andOutput[index2], enableAnd);
+            `AND checkIfOr(isOr[index2], orOutput[index2], enableOr);
+            `OR finalOutput(result[index2], isAdder[index2], isXor[index2], isSLT[index2], isAnd[index2], isOr[index2]);
+	end
         endgenerate
     endmodule
 
-    // `AND checkIfOutputOverflow(overflow, overflowFromAdder, invertedMuxIndex[0], invertedMuxIndex[1], invertedMuxIndex[2]);
-
-    module structuralFullAdder(out, carryout, a, b, carryin);
-    output out, carryout;
-    input a, b, carryin;
-    wire axorb, axorbandcarryin, aandb;
-    `XOR xorgate1(axorb, a, b); // xor gate produces axorb from a and b
-    `XOR xorgate2(out, axorb, carryin); //
-    `AND andgate1(axorbandcarryin, axorb, carryin); // and gate produces axorbandcarryinn from axorb and carryin
-    `AND andgate2(aandb, a, b);
-    `OR orgate1 carryout, axorbandcarryin, aandb); // or gate produces carryout from axorbandcarryin and aandb
+    module structuralFullAdder
+    (
+    output out,
+    output carryout,
+    input a,
+    input b,
+    input carryin
+    );
+    	wire axorb, axorbandcarryin, aandb;
+    	`XOR xorgate1(axorb, a, b); // xor gate produces axorb from a and b
+    	`XOR xorgate2(out, axorb, carryin); //
+    	`AND andgate1(axorbandcarryin, axorb, carryin); // and gate produces axorbandcarryinn from axorb and carryin
+    	`AND andgate2(aandb, a, b);
+    	`OR orgate1(carryout, axorbandcarryin, aandb); // or gate produces carryout from axorbandcarryin and aandb
     endmodule
 
     module adder
@@ -135,7 +127,7 @@ input[2:0]      command
       output carryout,  // Carry out of the summation of a and b
       output overflow,  // True if the calculation resulted in an overflow
       input[31:0] a,     // First operand in 2's complement format
-      input[31:0] b,      // Second operand in 2's complement format
+      input[31:0] b      // Second operand in 2's complement format
     );
       wire carryin = 0; // 0 is Carry in to the least significant bit
       wire co[31:0]; // Wiring the 32 1 bit adders together by assigning the previous carryout as the next carryin
@@ -143,7 +135,7 @@ input[2:0]      command
       structuralFullAdder adder0 (sum[0], co[0], a[0], b[0], carryin); // Instantiate the first 1 bit full adders
       generate
       genvar index;
-      for (index=1; index<31; index = index+1) begin
+      for (index=1; index<31; index = index+1) begin: fullAdderGenerate
         structuralFullAdder adder (sum[index], co[index], a[index], b[index], co[index-1]); // Instantiate the middle 30 1 bit full adders
       end
       endgenerate
@@ -215,6 +207,16 @@ input[2:0]      command
         	end
         endgenerate
     endmodule
+module ALU
+(
+output[31:0]    result,
+output          carryout,
+output          zero,
+output          overflow,
+input[31:0]     operandA,//a,b
+input[31:0]     operandB,//a,b
+input[2:0]      command
+);
 
     // set up LUT
     wire inv_a;
@@ -228,8 +230,8 @@ input[2:0]      command
 
     // set up adder
     wire[31:0] adderOutput;
-    wire adderCarryout
-    wire adderOverflow
+    wire adderCarryout;
+    wire adderOverflow;
 
     adder adderMod (adderOutput, adderCarryout, adderOverflow, inputA, inputB);
 
@@ -241,7 +243,7 @@ input[2:0]      command
     // set up SLT
     wire[31:0] sltOutput;
 
-    sltmodule sltMod (sltOutput, adderOutput, adderOverflow);
+    setlessthanmodule sltMod (sltOutput, adderOutput, adderOverflow);
 
     // set up nand
     wire[31:0] nandOutput;
@@ -266,28 +268,31 @@ input[2:0]      command
 
     `OR orCheck0(notZero[0], result[0], result[1]);
     generate
-    genvar index;
-
-    for index = 1; index<31; index = index + 1)
-        `OR orCheck(notZero[index], notZero[index - 1], result[index + 1]);
+    	genvar index;
+    	for(index = 1; index<31; index = index + 1)
+	begin: orCheckGen
+	    `OR orCheck(notZero[index], notZero[index - 1], result[index + 1]);
+	end
     endgenerate
 
     `NOT invertNotZero(zero, notZero[30]);
 endmodule
 
 module testALU;
-wire[31:0]    result,
-wire          carryout,
-wire          zero,
-wire          overflow,
-reg[31:0]     operandA,//a,b
-reg[31:0]     operandB,//a,b
-reg[2:0]      command
+wire[31:0]    result;
+wire          carryout;
+wire          zero;
+wire          overflow;
+reg[31:0]     operandA;//a,b
+reg[31:0]     operandB;//a,b
+reg[2:0]      command;
+
+ALU testingALU(result, carryout, zero, overflow, operandA, operandB, command);
 
 initial begin
 $display("opA opB cmd| O0 O1 O2 O3 | Expected Output");
 operandA=32'sb00111010_01110100_01110000_10110011 ;operandB=32'sb00101100_10011110_00010110_10110100;command=3'b0; #1000
-$display("%b  %b  %b |  %b  %b  %b  %b | Output = 01100111 00010010 10000111 01100111 with overflow = 0, carryout = 0" operandA, operandB, command, result, carryout, zero, overflow);
+$display("%b  %b  %b |  %b  %b  %b  %b | Output = 01100111 00010010 10000111 01100111 with overflow = 0, carryout = 0", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb11000100_11000000_10110011_01001001 ;operandB=32'sb11100000_10100101_11000110_01001000;command=3'b0; #1000
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 10100101 01100110 01111001 10010001 with overflow = 0, carryout = 1", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb00111010_01110100_01110000_10110011 ;operandB=32'sb11100000_10100101_11000110_01001000;command=3'b0; #1000
@@ -302,7 +307,7 @@ $display("%b  %b  %b |  %b  %b  %b  %b | Output = 11101111 10100011 10011010 101
 //Subtract
 $display("opA opB cmd| O0 O1 O2 O3 | Expected Output");
 operandA=32'sb01101110_01101011_10001001_00111110 ;operandB=32'sb00110111_00001010_01100010_11101001;command=3'b001; #1000
-$display("%b  %b  %b |  %b  %b  %b  %b | Output = 00110111_01100001_00100110_01010101 with overflow = 0, carryout = 1" operandA, operandB, command, result, carryout, zero, overflow);
+$display("%b  %b  %b |  %b  %b  %b  %b | Output = 00110111_01100001_00100110_01010101 with overflow = 0, carryout = 1", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb10000111_10011100_11000001_11000100 ;operandB=32'sb10101011_11010101_01011000_11101110;command=3'b001; #1000
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 11011011_11000111_01101000_11010110 with overflow = 0, carryout = 0", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb00110111_00001010_01100010_11101001 ;operandB=32'sb11101011_10010100_10110001_01010100;command=3'b001; #1000
@@ -317,9 +322,9 @@ $display("%b  %b  %b |  %b  %b  %b  %b | Output = 11101111 10100011 10011010 101
 //SLT
 $display("opA opB cmd| O0 O1 O2 O3 | Expected Output");
 operandA=32'sb01101110_01101011_10001001_00111110 ;operandB=32'sb00110111_00001010_01100010_11101001;command=3'b11; #1000
-$display("%b  %b  %b |  %b  %b  %b  %b | Output = 0" operandA, operandB, command, result, carryout, zero, overflow);
+$display("%b  %b  %b |  %b  %b  %b  %b | Output = 0", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb00101110_00001011_10001001_00111110 ;operandB=32'sb00110111_01101010_01111010_11101001;command=3'b11; #1000
-$display("%b  %b  %b |  %b  %b  %b  %b | Output = 1" operandA, operandB, command, result, carryout, zero, overflow);
+$display("%b  %b  %b |  %b  %b  %b  %b | Output = 1", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb10000111_10011100_11000001_11000100 ;operandB=32'sb10101011_11010101_01011000_11101110;command=3'b11; #1000
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 1", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb11100111_10011100_11000001_11000100 ;operandB=32'sb10101011_11010101_01011000_11101110;command=3'b11; #1000
@@ -332,36 +337,37 @@ $display("%b  %b  %b |  %b  %b  %b  %b | Output = 1", operandA, operandB, comman
 //XOR
 $display("opA opB cmd| O0 O1 O2 O3 | Expected Output");
 operandA=32'sb01101110_01101011_10001001_00111110 ;operandB=32'sb00110111_00001010_01100010_11101001;command=3'b010; #1000
-$display("%b  %b  %b |  %b  %b  %b  %b | Output = 01011001_01100001_11101011_11010111" operandA, operandB, command, result, carryout, zero, overflow);
+$display("%b  %b  %b |  %b  %b  %b  %b | Output = 01011001_01100001_11101011_11010111", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb10000111_10011100_11000001_11000100 ;operandB=32'sb10101011_11010101_01011000_11101110;command=3'b010; #1000
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 00101100_01001001_10011001_00101010", operandA, operandB, command, result, carryout, zero, overflow);
 
 //AND
 $display("opA opB cmd| O0 O1 O2 O3 | Expected Output");
 operandA=32'sb01101110_01101011_10001001_00111110 ;operandB=32'sb00110111_00001010_01100010_11101001;command=3'b100; #1000
-$display("%b  %b  %b |  %b  %b  %b  %b | Output = 00100110_00001010_00000000_00101000" operandA, operandB, command, result, carryout, zero, overflow);
+$display("%b  %b  %b |  %b  %b  %b  %b | Output = 00100110_00001010_00000000_00101000", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb10000111_10011100_11000001_11000100 ;operandB=32'sb10101011_11010101_01011000_11101110;command=3'b100; #1000
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 10000011_10010100_01000000_11000100", operandA, operandB, command, result, carryout, zero, overflow);
 
 //NAND
 $display("opA opB cmd| O0 O1 O2 O3 | Expected Output");
 operandA=32'sb01101110_01101011_10001001_00111110 ;operandB=32'sb00110111_00001010_01100010_11101001;command=3'b101; #1000
-$display("%b  %b  %b |  %b  %b  %b  %b | Output = 11011001_11110101_11111111_11010111" operandA, operandB, command, result, carryout, zero, overflow);
+$display("%b  %b  %b |  %b  %b  %b  %b | Output = 11011001_11110101_11111111_11010111", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb10000111_10011100_11000001_11000100 ;operandB=32'sb10101011_11010101_01011000_11101110;command=3'b101; #1000
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 01111100_01101011_10111111_00111011", operandA, operandB, command, result, carryout, zero, overflow);
 
 //NOR
 $display("opA opB cmd| O0 O1 O2 O3 | Expected Output");
 operandA=32'sb01101110_01101011_10001001_00111110 ;operandB=32'sb00110111_00001010_01100010_11101001;command=3'b110; #1000
-$display("%b  %b  %b |  %b  %b  %b  %b | Output = 10000000_10010100_00010100_00000000" operandA, operandB, command, result, carryout, zero, overflow);
+$display("%b  %b  %b |  %b  %b  %b  %b | Output = 10000000_10010100_00010100_00000000", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb10000111_10011100_11000001_11000100 ;operandB=32'sb10101011_11010101_01011000_11101110;command=3'b110; #1000
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 01010000_00100010_00100110_00010001", operandA, operandB, command, result, carryout, zero, overflow);
 
 //OR
 $display("opA opB cmd| O0 O1 O2 O3 | Expected Output");
 operandA=32'sb01101110_01101011_10001001_00111110 ;operandB=32'sb00110111_00001010_01100010_11101001;command=3'b111; #1000
-$display("%b  %b  %b |  %b  %b  %b  %b | Output = 01111111_01101011_11101011_11111111" operandA, operandB, command, result, carryout, zero, overflow);
+$display("%b  %b  %b |  %b  %b  %b  %b | Output = 01111111_01101011_11101011_11111111", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb10000111_10011100_11000001_11000100 ;operandB=32'sb10101011_11010101_01011000_11101110;command=3'b111; #1000
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 10101111_11011101_11011001_11101110 ", operandA, operandB, command, result, carryout, zero, overflow);
 end
 endmodule
+
