@@ -313,7 +313,7 @@ $display("%b  %b  %b |  %b  %b  %b  %b | Output = 10100101 01100110 01111001 100
 operandA=32'sb00111010_01110100_01110000_10110011 ;operandB=32'sb11100000_10100101_11000110_01001000;command=3'b0; #1000
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 00011011 00011010 00110110 11111011 with overflow = 0, carryout = 1", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb11000100_11000000_10110011_01001001 ;operandB=32'sb00101100_10011110_00010110_10110100;command=3'b0; #1000
-$display("%b  %b  %b |  %b  %b  %b  %b | Output = 11110001 01011110 11001001 11111101 with overflow = 0, carryout = 0 I think (not sure)", operandA, operandB, command, result, carryout, zero, overflow);
+$display("%b  %b  %b |  %b  %b  %b  %b | Output = 11110001 01011110 11001001 11111101 with overflow = 0, carryout = 0", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb01000101_11000111_00100111_11010100 ;operandB=32'sb01000001_10001110_10101000_10011011;command=3'b0; #1000
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 10000111 01010101 11010000 01101111 with overflow = 1, carryout = 0", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb10101011_11010101_01011000_11101110 ;operandB=32'sb10000111_10011100_11000001_11000100;command=3'b0; #1000
@@ -328,7 +328,7 @@ $display("%b  %b  %b |  %b  %b  %b  %b | Output = 11011011_11000111_01101000_110
 operandA=32'sb00110111_00001010_01100010_11101001 ;operandB=32'sb11101011_10010100_10110001_01010100;command=3'b001; #1000
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 10110100_00000000_11111010_00101011 with overflow = 0, carryout = 0", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb11110001_11110100_01100010_00110110 ;operandB=32'sb00111011_10010000_01110111_01101011;command=3'b001; #1000
-$display("%b  %b  %b |  %b  %b  %b  %b | Output = 10110110_01100011_11101010_11001011 with overflow = 0, carryout = 1 I think (not sure)", operandA, operandB, command, result, carryout, zero, overflow);
+$display("%b  %b  %b |  %b  %b  %b  %b | Output = 10110110_01100011_11101010_11001011 with overflow = 0, carryout = 1", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb01000101_11000111_00100111_11010100 ;operandB=32'sb10111110_01110001_01010111_01100101;command=3'b001; #1000
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 10000111 01010101 11010000 01101111 with overflow = 1, carryout = 0", operandA, operandB, command, result, carryout, zero, overflow);
 operandA=32'sb10101011_11010101_01011000_11101110 ;operandB=32'sb01111000_01100011_00111110_00111100;command=3'b001; #1000
