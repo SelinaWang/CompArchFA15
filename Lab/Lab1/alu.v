@@ -1,10 +1,17 @@
+/*
+ALU (a subset of the standard MIPS ALU)
+Operations: Add, Subtract, Xor, Set Less Than, And, Nand, Nor, Or
+Authors: Brenna Manning, William Saulnier, Ziyu (Selina) Wang
+Last Modified: 11-14-15
+*/
+
 //define gate delays
-`define AND and #20
-`define OR or #20
+`define AND and #30
+`define OR or #30
 `define NOT not #10
-`define NOR nor #10
-`define NAND nand #10
-`define XOR xor #30
+`define NOR nor #20
+`define NAND nand #20
+`define XOR xor #80
 
 //define operations
 `define ADD_OP  3'd0
@@ -15,7 +22,20 @@
 `define NAND_OP 3'd5
 `define NOR_OP  3'd6
 `define OR_OP   3'd7
-module ALUcontrolLUT
+
+module ALU
+(
+output[31:0]    result,
+output          carryout,
+output          zero,
+output          overflow,
+input[31:0]     operandA,
+input[31:0]     operandB,
+input[2:0]      command
+);
+
+    // Control Logic LUT using behavorial verilog
+    module ALUcontrolLUT
     (
     output reg[2:0] muxindex,
     output reg  inv_a,
@@ -36,6 +56,7 @@ module ALUcontrolLUT
       end
     endmodule
 
+    // Decide whether or not to invert the inputs before putting them into operation modules
     module inputInverter
     (
     output[31:0] Output,
@@ -58,6 +79,7 @@ module ALUcontrolLUT
         endgenerate
     endmodule
 
+    // Using a MUX to choose which operation output is the desired final output
     module muxer
     (
     output[31:0] result,
@@ -105,6 +127,7 @@ module ALUcontrolLUT
         endgenerate
     endmodule
 
+    // 1 bit adder used to construct the 32 bit adder
     module structuralFullAdder
     (
     output out,
@@ -121,6 +144,7 @@ module ALUcontrolLUT
     	`OR orgate1(carryout, axorbandcarryin, aandb); // or gate produces carryout from axorbandcarryin and aandb
     endmodule
 
+    // 32 bit adder
     module adder
     (
       output[31:0] sum,  // 2's complement sum of a and b
@@ -140,17 +164,18 @@ module ALUcontrolLUT
       end
       endgenerate
       structuralFullAdder adderlast (sum[31], carryout, a[31], b[31], co[30]); // Instantiate the last 1 bit full adders
-      `XOR xorgate(overflow, co[30], carryout); // xor gate produces overflow from carryout2(carryin to the most significant bit and carryout
+      `XOR xorgate(overflow, co[30], carryout); // xor gate produces overflow from carryin to the most significant bit and carryout
     endmodule
 
-    module setlessthanmodule //Outputs a single bit (1 if input a is less than input b)
+    //Outputs a single bit (1 if input a is less than input b)
+    module setlessthanmodule
     (
     output[31:0] sltout,
     input[31:0] sum,
     input overflow
     );
         //XOR Overflow and SumMSB output from 32bitAdder/Subtractor
-        //If a < b: If no overflow, msb of sum = 1 If overflow, msb of sum will = 0
+        //If a < b: If no overflow, msb of sum = 1; If overflow, msb of sum will = 0
         `XOR xorgate_slt(sltout[0], sum[31], overflow);
 	genvar index;
 	generate
@@ -158,9 +183,7 @@ module ALUcontrolLUT
 		assign sltout[index] = 0;
 	end
 	endgenerate
-        //Note: No generate needed for SLT because only 1 bit matters in each! (Output also 1 bit true/false)
     endmodule
-
 
     module xormodule
     (
@@ -173,19 +196,18 @@ module ALUcontrolLUT
       genvar index;
       for (index=0; index<32; index = index+1)
         begin: xorgen
-          `XOR xorgate1(out[index], a[index], b[index]);
+          `XOR xorgate(out[index], a[index], b[index]);
         end
       endgenerate
     endmodule
 
-    module nandmodule
+    //becomes NOR gate if the inputs a and b are both inverted
+    module nandmodule  
     ( //out=1 if a=1 and b=1, else out = 0
     output[31:0] out,
     input[31:0] a,
     input[31:0] b
     );
-
-        //becomes NOR gate if the inputs a and b are both inverted (?)
 
         generate //generate 32 AND gate to compare all 32 bits of a and b
         genvar index;
@@ -196,14 +218,13 @@ module ALUcontrolLUT
         endgenerate
     endmodule
 
+    //becomes NAND gate if a and b are both inverted
     module normodule
     (
     output[31:0] out,
     input[31:0] a,
     input [31:0] b
     );
-
-        //becomes NAND gate if a and b are both inverted (?)
 
         generate //generate 32 OR gates to or all32 bits of a and b
         genvar index;
@@ -213,16 +234,7 @@ module ALUcontrolLUT
         	end
         endgenerate
     endmodule
-module ALU
-(
-output[31:0]    result,
-output          carryout,
-output          zero,
-output          overflow,
-input[31:0]     operandA,//a,b
-input[31:0]     operandB,//a,b
-input[2:0]      command
-);
+
 
     // set up LUT
     wire inv_a;
@@ -385,4 +397,3 @@ operandA=32'sb10000111_10011100_11000001_11000100 ;operandB=32'sb10101011_110101
 $display("%b  %b  %b |  %b  %b  %b  %b | Output = 10101111_11011101_11011001_11101110 ", operandA, operandB, command, result, carryout, zero, overflow);
 end
 endmodule
-
