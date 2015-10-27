@@ -1,57 +1,3 @@
-#HW4 Deliverables#
-
-##Deliverable 1##
-Circuit diagram of the first register implementation
-![Circuit diagram of the first register implementation](https://github.com/SelinaWang/CompArchFA15/blob/master/HW/HW4/D-Flip-Flop-1.PNG)
-
-Circuit diagram of the second register implementation
-![Circuit diagram of the second register implementation](https://github.com/SelinaWang/CompArchFA15/blob/master/HW/HW4/D-Flip-Flop-2.PNG)
-
-##Deliverable 2##
-```
-// 32-bit D Flip-Flop with enable
-//   Positive edge triggered
-module register32
-(
-output reg[31:0]	q,
-input[31:0]		d,
-input			wrenable,
-input			clk
-);
-
-    always @(posedge clk) begin
-        if(wrenable) begin
-            q = d;
-        end
-    end
-
-endmodule
-```
-
-##Deliverable 3##
-```
-// 32-bit D Flip-Flop with enable
-//   Positive edge triggered
-// Always output zero
-module register32zero
-(
-output reg[31:0]	q,
-input[31:0]		d,
-input			wrenable,
-input			clk
-);
-
-    always @(posedge clk) begin
-        if(wrenable) begin
-            q = 0;
-        end
-    end
-
-endmodule
-```
-
-##Deliverable 4##
-```
 // 32:1 MUX
 module mux32to1by1
 (
@@ -61,10 +7,7 @@ input[31:0] inputs
 );
   assign out=inputs[address];
 endmodule
-```
 
-##Deliverable 5##
-```
 // multiplexer that is 32 bits wide and 32 inputs deep
 module mux32to1by32
 (
@@ -110,7 +53,3 @@ input[31:0]	input21, input22, input23, input24, input25, input26, input27, input
   assign mux[31] = input31;
   assign out = mux[address];    // Connect the output of the array
 endmodule
-```
-
-##Deliverable 6##
-The input *enable* is a single bit value of either 0 or 1. The input *address* is a 5 bit value that has a range between 0 and 31. The '<<' symbol represents a left shift. When *enable* is 1 and we shift it to the left by the *address*, we get a 32 bit number with all zeros except for the bit specified by the *address*. When *enable* is 0, the shift outputs a 32 bit number where each bit is 0.
