@@ -1,0 +1,34 @@
+LAB 2 WORK PLAN
+
+INPUT CONDITIONING:
+inputconditioner.v			0.5  hr | 10/31
+inputconditioner.t.v		0.5  hr | 10/31
+inputconditioner.do			0.25 hr | 10/31
+circuit diagram				0.5  hr | 10/31
+analysis					0.5  hr | 10/31
+
+SHIFT REGISTER:
+shiftregister.v				0.5  hr | 11/04
+shiftregister.t.v			0.5  hr | 11/04
+strategy description		0.25 hr | 11/04
+
+MIDPOINT CHECK IN:
+midpoint.v					0.75 hr | 11/04
+FPGA testing				0.5  hr | 11/04
+video making				0.5  hr | 11/04
+
+SPI MEMORY:
+spimemory.v					2   hrs | 11/08
+FPGA testing				0.5  hr | 11/08
+ARM processor test 			0.5  hr | 11/08
+test strategy 				0.5  hr | 11/08
+
+FAULT INJECTION:
+testing 					1    hr | 11/08
+schematic 					0.5  hr | 11/08
+explanation					0.5  hr | 11/08
+
+
+TOTAL HOURS:				11  hrs | 11/09
+
+
