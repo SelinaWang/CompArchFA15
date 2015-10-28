@@ -8,14 +8,14 @@ circuit diagram				0.5  hr | 10/31
 analysis					0.5  hr | 10/31
 
 SHIFT REGISTER:
-shiftregister.v				0.5  hr | 11/04
-shiftregister.t.v			0.5  hr | 11/04
-strategy description		0.25 hr | 11/04
+shiftregister.v				0.5  hr | 11/02
+shiftregister.t.v			0.5  hr | 11/02
+strategy description		0.25 hr | 11/02
 
 MIDPOINT CHECK IN:
-midpoint.v					0.75 hr | 11/04
-FPGA testing				0.5  hr | 11/04
-video making				0.5  hr | 11/04
+midpoint.v					0.75 hr | 11/02
+FPGA testing				0.5  hr | 11/02
+video making				0.5  hr | 11/02
 
 SPI MEMORY:
 spimemory.v					2   hrs | 11/08
