@@ -16,11 +16,11 @@ module testConditioner();
 			 .positiveedge(rising),
 			 .negativeedge(falling));
 
-	
+
     // Generate clock (50MHz)
     initial clk=1;
     always #10 clk=!clk;    // 50MHz Clock
-    
+
     initial begin
     // Your Test Code
     // Be sure to test each of the three conditioner functions:
@@ -40,7 +40,7 @@ module testConditioner();
         #10 // we are now 5.5 cycles though our clock, we should now be high.
 
         $display("%b | 1", conditioned);
-        if(conditioned != 1 && (rising && !falling)) begin
+        if(conditioned != 1 || (!rising || falling)) begin
 	    $display("Synchronize Failed: No rising edge or failure to properly set conditioned output.");
 	end
 
@@ -50,7 +50,7 @@ module testConditioner();
 
         //Clean: Bounce up to 5 clock cycles - remain the same
 	pin = 1;
-	for ( i = 0; i < 5; i = i + 1) begin 
+	for ( i = 0; i < 5; i = i + 1) begin
                 #20 // must wait for at least 1 clock cycle
 		pin = i%2;
                 $display("%b | 1", conditioned);
@@ -66,8 +66,8 @@ module testConditioner();
 	pin = 0;
         #120 // must wait for at least 5 clock cycles + 1 for the pulse
 
-	if ((clk == 4) && (!rising && !falling)) begin
-		$display("Preprocess Failed: No edge detection when expected");
+	if ((rising || !falling) || (conditioned == 1)) begin
+		$display("Preprocess Failed: No edge detection when expected or conditioned did not change in time.");
 	end
 
         $display("Preprocess test complete");
