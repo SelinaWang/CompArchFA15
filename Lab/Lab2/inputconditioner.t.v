@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------
 // Input Conditioner test bench
 //------------------------------------------------------------------------
-
+`include "inputconditioner.v"
 module testConditioner();
 
     reg clk;
@@ -9,16 +9,16 @@ module testConditioner();
     wire conditioned;
     wire rising;
     wire falling;
-    wire dutpassed;
+    integer i;
     inputconditioner dut(.clk(clk),
     			 .noisysignal(pin),
 			 .conditioned(conditioned),
 			 .positiveedge(rising),
-			 .negativeedge(falling))
+			 .negativeedge(falling));
 
 	
     // Generate clock (50MHz)
-    initial clk=0;
+    initial clk=1;
     always #10 clk=!clk;    // 50MHz Clock
     
     initial begin
@@ -27,37 +27,58 @@ module testConditioner();
     // Synchronize, Clean, Preprocess (edge finding)
 
 
- //Synchronize: 5 seconds delay
+        //Synchronize: 5 seconds delay
 	pin = 1;
-	for(clk=0; clk<4; clk=clk+1) begin
-		if(rising || falling)begin
-			dutpassed = 0;
-			$display("Synchronize Failed: Edge detection before expected delay");
+	for ( i = 0; i < 5; i = i + 1) begin
+                #20 // must wait for at least 1 clock cycle
+                $display("%b | 0", conditioned);
+		if(conditioned == 1 || (rising || falling)) begin
+			$display("Synchronize Failed: Conditioned output high before full delay is passed.");
 		end
 	end
-	
 
-//Clean: Bounce up to 5 clock cycles - remain the same
+        #10 // we are now 5.5 cycles though our clock, we should now be high.
+
+        $display("%b | 1", conditioned);
+        if(conditioned != 1 && (rising && !falling)) begin
+	    $display("Synchronize Failed: No rising edge or failure to properly set conditioned output.");
+	end
+
+        $display("Synchronize tests complete");
+
+        #30 // wait for stablization.
+
+        //Clean: Bounce up to 5 clock cycles - remain the same
 	pin = 1;
-	integer i = 0;
-	for(i=0; i<5; i = i +1)begin 
-		clk = i;
+	for ( i = 0; i < 5; i = i + 1) begin 
+                #20 // must wait for at least 1 clock cycle
 		pin = i%2;
+                $display("%b | 1", conditioned);
 		if(rising || falling)begin
-			dutpassed = 0;
 			$display("Clean Failed: Edge detection from bouncing");
 		end
 	end
-	
-		
-		
-		
 
-//Preprocess: when edge should change we detect both edges
-	pin = 1;
-	if ((clk = 4) && (!rising && !falling)) begin
-		dutpassed =0;
+        $display("Clean test complete");
+
+        //Preprocess: when edge should change we detect both edges
+
+	pin = 0;
+        #120 // must wait for at least 5 clock cycles + 1 for the pulse
+
+	if ((clk == 4) && (!rising && !falling)) begin
 		$display("Preprocess Failed: No edge detection when expected");
 	end
+
+        $display("Preprocess test complete");
+
+        #20 // just for us so we can see the pulse.
+
+        if (rising || falling) begin
+            $display("Test failure: Edge not cleared in time");
+        end
+
+    $stop;
+    end
 
 endmodule
