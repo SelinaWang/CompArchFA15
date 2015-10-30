@@ -31,7 +31,7 @@ module testshiftregister();
         parallelLoad = 1;
         #40 // full cycle to wait
         parallelLoad = 0;
-        $display("%b | %b", serialDataOut, parallelDataOut);
+        $display("%b %b | 1 10101010", serialDataOut, parallelDataOut);
     	if(serialDataOut != 1) begin
             $display("Test Case 1 Failed. Data load did not work");
         end
@@ -40,7 +40,7 @@ module testshiftregister();
         #20
         peripheralClkEdge = 0;
         #20
-        $display("%b | %b", serialDataOut, parallelDataOut);
+        $display("%b %b | 0 01010101", serialDataOut, parallelDataOut);
         if(serialDataOut != 0) begin
             $display("Test Case 2 Failed. Paralell load always active or shift didn't work.");
         end
@@ -48,14 +48,23 @@ module testshiftregister();
         #20
         peripheralClkEdge = 0;
         #20
-        $display("%b | %b", serialDataOut, parallelDataOut);
+        $display("%b %b | 1 10101011", serialDataOut, parallelDataOut);
         if(serialDataOut != 1 || parallelDataOut != 8'b10101011) begin
             $display("Test Case 3 Failed. Paralell load always active or shift didn't insert correctly, or parallel is bad.");
         end
         #40 //check for wait
-        $display("%b | %b", serialDataOut, parallelDataOut);
+        $display("%b %b | 1 10101011", serialDataOut, parallelDataOut);
         if(serialDataOut != 1 || parallelDataOut != 8'b10101011) begin
             $display("Test Case 4 Failed. Shift register not properly holding state.");
+        end
+        serialDataIn = 0;
+        peripheralClkEdge = 1;
+        #20
+        peripheralClkEdge = 0;
+        #20
+        $display("%b %b | 0 01010110", serialDataOut, parallelDataOut);
+        if(serialDataOut != 0 || parallelDataOut != 8'b01010110) begin
+            $display("Test Case 5 Failed. Shift of a 0 in doesn't work.");
         end
         $display("Done");
         $stop;
