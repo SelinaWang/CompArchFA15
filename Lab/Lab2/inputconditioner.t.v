@@ -1,7 +1,13 @@
 //------------------------------------------------------------------------
 // Input Conditioner test bench
 //------------------------------------------------------------------------
+<<<<<<< HEAD
 `include "inputconditioner.v"
+=======
+
+`include 
+"inputconditioner.v"
+>>>>>>> origin/master
 module testConditioner();
 
     reg clk;
