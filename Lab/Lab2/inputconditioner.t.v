@@ -2,6 +2,8 @@
 // Input Conditioner test bench
 //------------------------------------------------------------------------
 
+`include 
+"inputconditioner.v"
 module testConditioner();
 
     reg clk;
@@ -9,16 +11,18 @@ module testConditioner();
     wire conditioned;
     wire rising;
     wire falling;
-    wire dutpassed;
+    reg dutpassed = 0;
+    integer i = 0;
     inputconditioner dut(.clk(clk),
     			 .noisysignal(pin),
 			 .conditioned(conditioned),
 			 .positiveedge(rising),
-			 .negativeedge(falling))
+			 .negativeedge(falling));
 
 	
     // Generate clock (50MHz)
     initial clk=0;
+    initial dutpassed = 0;
     always #10 clk=!clk;    // 50MHz Clock
     
     initial begin
@@ -39,7 +43,7 @@ module testConditioner();
 
 //Clean: Bounce up to 5 clock cycles - remain the same
 	pin = 1;
-	integer i = 0;
+	
 	for(i=0; i<5; i = i +1)begin 
 		clk = i;
 		pin = i%2;
@@ -55,9 +59,14 @@ module testConditioner();
 
 //Preprocess: when edge should change we detect both edges
 	pin = 1;
-	if ((clk = 4) && (!rising && !falling)) begin
-		dutpassed =0;
-		$display("Preprocess Failed: No edge detection when expected");
+
+	for(clk=0; clk<5; clk=clk+1) begin
+		if((clk==4)&&(!rising&&!falling))begin
+			dutpassed = 0;
+			$display("Preprocess Failed: No edge detection when expected");
+		end
+
+	end
 	end
 
 endmodule
