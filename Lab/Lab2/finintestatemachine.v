@@ -52,6 +52,7 @@ output reg          miso_e       // MISO enable
           end
           4: begin
             sr_we <= 0;
+            miso_e <= 1;
             counter <= counter + 1;
             if (counter == 8) begin
               state <= 7;
@@ -71,6 +72,7 @@ output reg          miso_e       // MISO enable
           end
           7: begin
             dm_we <= 0;
+            miso_e <= 0;
             counter <= 0;
           end
         endcase
