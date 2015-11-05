@@ -12,7 +12,31 @@ module spiMemory
     input           fault_pin,  // For fault injection testing
     output [3:0]    leds        // LEDs for debugging
 )
+wire conditioned1;
+wire conditioned2;
+wire conditioned3;
+wire positiveedge1;
+wire positiveedge2;
+wire positveedge3;
+wire negativeedge1;
+wire negativeedge2;
+wire negativeedge3;
+wire sr_we;
+wire dm_we;
+wire dout;
+wire din;
+wire addr_we;
+wire miso_buff;
+wire parallelout;
+wire serialout;
+wire datamem_address
 
+inputconditioner(clk, mosi_pin, conditioned1, positiveedge1, negativeedge1);
+inputconditioner(clk, sclk_pin, conditioned2, positiveedge2, negativeedge2);
+inputconditioner(clk, cs_pin, conditioned3, positiveedge3, negativeedge3);
+shiftregister(clk, positiveedge2, sr_we, dout, conditioned1, parallelout, serialout);
+finitestatemachine(positiveedge2, conditioned3, parallelout[0], sr_we, dm_we, addr_we, miso_buff);
+datamem(dout, din, datamem_address, dm_we, clk);
 
 endmodule
    
