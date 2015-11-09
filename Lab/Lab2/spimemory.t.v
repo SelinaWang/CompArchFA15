@@ -36,7 +36,6 @@ module testspimemory();
       address =   7'b1011010;
       value =     8'b11011011;
       readValue = 8'b00000000;
-      i = 0;
       #160;
       cs_pin = 0;
       for (i = 1; i <= 7; i = i + 1)
@@ -69,7 +68,64 @@ module testspimemory();
         #160;
       end
       #80; // get yourself back on track
-      $display("Test 1: %b | %b", readValue, value);
+      $display("Test 1: %b | b11011011", readValue);
+      cs_pin = 1;
+      // test 2: add some more data and check persistance.
+      address =   7'b0010110;
+      value =     8'b01010101;
+      readValue = 8'b00000000;
+      #160;
+      cs_pin = 0;
+      for (i = 1; i <= 7; i = i + 1)
+      begin
+        mosi_pin = address[7-i];
+        $display("mosi set to %b", mosi_pin);
+        #160;
+      end
+      mosi_pin = 0;
+      #160;
+      for (i = 1; i <= 8; i = i + 1)
+      begin
+        mosi_pin = value[8-i];
+        #160;
+      end
+      cs_pin = 1;
+      #160;
+      #160; // additional wait
+      address =   7'b1011010;
+      cs_pin = 0;
+      for (i = 1; i <= 7; i = i + 1)
+      begin
+        mosi_pin = address[7-i];
+        #160;
+      end
+      mosi_pin = 1;
+      #880; //You must wait at least 5 cycles (2 sync cycles and 3 clean cycles for input reg) plus a half cycle to read on the low.
+      for (i = 1; i <= 8; i = i + 1)
+      begin
+        readValue[8-i] = miso_pin;
+        #160;
+      end
+      #80; // get yourself back on track
+      $display("Test 2: %b | b11011011", readValue);
+      cs_pin = 1;
+      #160; // additional wait
+      address =   7'b0010110;
+      cs_pin = 0;
+      for (i = 1; i <= 7; i = i + 1)
+      begin
+        mosi_pin = address[7-i];
+        #160;
+      end
+      mosi_pin = 1;
+      #880; //You must wait at least 5 cycles (2 sync cycles and 3 clean cycles for input reg) plus a half cycle to read on the low.
+      for (i = 1; i <= 8; i = i + 1)
+      begin
+        readValue[8-i] = miso_pin;
+        #160;
+      end
+      #80; // get yourself back on track
+      $display("Test 3: %b | b01010101", readValue);
       $stop;
     end
 endmodule
