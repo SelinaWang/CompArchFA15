@@ -17,8 +17,7 @@ module testspimemory();
     		           .cs_pin(cs_pin),
     		           .miso_pin(miso_pin),
     		           .mosi_pin(mosi_pin),
-    		           .fault_pin(fault_pin),
-    		           .leds(leds));
+    		           .fault_pin(fault_pin);
 
 // Generate clock (50MHz)
     initial clk=1;

@@ -10,7 +10,6 @@ module spiMemory
     output          miso_pin,   // SPI master in slave out
     input           mosi_pin,   // SPI master out slave in
     input           fault_pin,  // For fault injection testing
-    output [3:0]    leds        // LEDs for debugging
 )
 wire conditioned1;
 wire conditioned2;
@@ -48,4 +47,3 @@ bufif1 misobuff (miso_pin, dff_q, miso_bufe);
 
 
 endmodule
-   
