@@ -32,6 +32,7 @@ module testspimemory();
       mosi_pin = 0;
       sclk_pin = 0;
       cs_pin = 1;
+      fault_pin = 1;
       #160;
       address =   7'b1011010;
       value =     8'b11011011;
@@ -41,7 +42,6 @@ module testspimemory();
       for (i = 1; i <= 7; i = i + 1)
       begin
         mosi_pin = address[7-i];
-        $display("mosi set to %b", mosi_pin);
         #160;
       end
       mosi_pin = 0;
@@ -126,6 +126,28 @@ module testspimemory();
       end
       #80; // get yourself back on track
       $display("Test 3: %b | b01010101", readValue);
+      // test 4 for fault injection case
+      cs_pin = 1;
+      #160; // additional wait
+      address =   7'b1010110;
+      cs_pin = 0;
+      for (i = 1; i <= 7; i = i + 1)
+      begin
+        mosi_pin = address[7-i];
+        #160;
+      end
+      mosi_pin = 1;
+      #880; //You must wait at least 5 cycles (2 sync cycles and 3 clean cycles for input reg) plus a half cycle to read on the low.
+      for (i = 1; i <= 8; i = i + 1)
+      begin
+        readValue[8-i] = miso_pin;
+        #160;
+      end
+      #80; // get yourself back on track
+      if(readValue == 8'b01010101) begin
+	$display("fault! most signifigant address bit is stuck at 1");
+      end
+      $display("Test 4: %b != b01010101, if it does, fault.", readValue);
       $stop;
     end
 endmodule

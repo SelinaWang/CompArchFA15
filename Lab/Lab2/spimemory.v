@@ -42,7 +42,7 @@ inputconditioner ic1(clk, sclk_pin, conditioned2, posSCLK, negSCLK);
 inputconditioner ic2(clk, cs_pin, conditioned3, positiveedge3, negativeedge3);
 shiftregister sr0(clk, posSCLK, sr_we, dataOut, conditioned1, parallelout, serialout);
 finitestatemachine fsm(posSCLK, conditioned3, parallelout[0], sr_we, dm_we, addr_we, miso_bufe);
-addresslatch al(datamem_address, parallelout, addr_we, clk);
+addresslatch al(datamem_address, parallelout, addr_we, clk, fault_pin);
 datamemory dm(clk, dataOut, datamem_address[1 +: 7], dm_we, parallelout);
 dff df(dff_q, serialout, negSCLK, clk);
 
