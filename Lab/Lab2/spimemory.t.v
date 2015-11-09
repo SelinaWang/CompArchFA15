@@ -26,6 +26,7 @@ module testspimemory();
     reg[7:0] value;
     reg[7:0] readValue;
     integer i;
+    integer j;
     always #10 clk=!clk;    // 50MHz Clock
     always #80 sclk_pin=!sclk_pin;
     initial begin
@@ -34,6 +35,51 @@ module testspimemory();
       cs_pin = 1;
       fault_pin = 1;
       #160;
+      for (j = 0; j < 128; j = j + 1) begin
+        address = j;
+        value = j;
+        #160;
+        cs_pin = 0;
+        for (i = 1; i <= 7; i = i + 1)
+        begin
+          mosi_pin = address[7-i];
+          #160;
+        end
+        mosi_pin = 0;
+        #160;
+        for (i = 1; i <= 8; i = i + 1)
+        begin
+          mosi_pin = value[8-i];
+          #160;
+        end
+        cs_pin = 1;
+        #160;
+      end
+
+      for (j = 0; j < 128; j = j + 1) begin
+        address = j;
+        readValue = 8'b00000000;
+        cs_pin = 0;
+        for (i = 1; i <= 7; i = i + 1)
+        begin
+          mosi_pin = address[7-i];
+          #160;
+        end
+        mosi_pin = 1;
+        #880; //You must wait at least 5 cycles (2 sync cycles and 3 clean cycles for input reg) plus a half cycle to read on the low.
+        for (i = 1; i <= 8; i = i + 1)
+        begin
+          readValue[8-i] = miso_pin;
+          #160;
+        end
+        #80; // get yourself back on track
+        if (readValue != j) begin
+	  $display("fault at mem address %b expected that value got %b", j[7:0], readValue);
+	end
+        cs_pin = 1;
+        #160;
+      end
+      
       address =   7'b1011010;
       value =     8'b11011011;
       readValue = 8'b00000000;
@@ -79,7 +125,6 @@ module testspimemory();
       for (i = 1; i <= 7; i = i + 1)
       begin
         mosi_pin = address[7-i];
-        $display("mosi set to %b", mosi_pin);
         #160;
       end
       mosi_pin = 0;
