@@ -5,8 +5,7 @@ module addresslatch
 output reg[7:0]		q,
 input[7:0]		d,
 input			ce,
-input			clk,
-input                   fault_pin
+input			clk
 );
     initial begin
       q <= 0;

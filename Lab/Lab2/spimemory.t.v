@@ -33,7 +33,7 @@ module testspimemory();
       mosi_pin = 0;
       sclk_pin = 0;
       cs_pin = 1;
-      fault_pin = 1;
+      fault_pin = 0; // !!!Change this to 1 if testing Fault Injection!!!
       #160;
       for (j = 0; j < 128; j = j + 1) begin
         address = j;
