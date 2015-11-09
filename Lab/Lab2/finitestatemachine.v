@@ -12,8 +12,8 @@ output reg          dm_we,       // Data Memory Write Enable
 output reg          a_le,    // Address latch enable
 output reg          miso_e       // MISO enable
 );
-    reg counter;
-    reg state;
+    reg[3:0] counter;
+    reg[3:0] state;
     always @(posedge sclk) begin
       if (cs_pin) begin
         counter <= 0;
@@ -22,6 +22,7 @@ output reg          miso_e       // MISO enable
         dm_we <= 0;
         a_le <= 0;
         miso_e <= 0;
+        $display("cs_pin high");
       end
       else begin
         case(state)
@@ -29,10 +30,10 @@ output reg          miso_e       // MISO enable
             $display("case 0");
             sr_we <= 0;
             dm_we <= 0;
-            a_le <= 0;
+            a_le <= 1;
             miso_e <= 0;
             counter <= counter + 1;
-            if (counter == 8) begin
+            if (counter == 7) begin
               state <= 1;
             end
           end
@@ -41,8 +42,8 @@ output reg          miso_e       // MISO enable
             sr_we <= 0;
             dm_we <= 0;
             miso_e <= 0;
-            a_le <= 1;
             counter <= 0;
+            a_le <= 0;
             if(shiftregisterlsb) begin
               state <= 2;
             end
@@ -73,29 +74,20 @@ output reg          miso_e       // MISO enable
             a_le <= 0;
             miso_e <= 1;
             counter <= counter + 1;
-            if (counter == 8) begin
+            if (counter == 7) begin
               state <= 7;
             end
           end
           5: begin
             $display("case 5");
             sr_we <= 0;
-            dm_we <= 0;
+            dm_we <= 1;
             a_le <= 0;
             miso_e <= 0;
             counter <= counter + 1;
-            if (counter == 8) begin
-              state <= 6;
+            if (counter == 7) begin
+              state <= 7;
             end
-          end
-          6: begin
-            counter <= 0;
-            $display("case 6");
-            sr_we <= 0;
-            a_le <= 0;
-            miso_e <= 0;
-            dm_we <= 1;
-            state <= 7;
           end
           7: begin
             $display("case 7");

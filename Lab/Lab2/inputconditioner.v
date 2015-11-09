@@ -22,6 +22,8 @@ output reg  negativeedge    // 1 clk pulse at falling edge of conditioned
     reg synchronizer1 = 0;
     initial begin
         conditioned <= 0;
+        positiveedge <= 0;
+        negativeedge <= 0;
     end
     
     always @(posedge clk ) begin

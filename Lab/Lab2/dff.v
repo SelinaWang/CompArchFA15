@@ -7,10 +7,12 @@ input		d,
 input		ce,
 input		clk
 );
-
+    initial begin
+      q <= 0;
+    end
     always @(posedge clk) begin
         if (ce) begin
-            q = d;
+            q <= d;
         end
     end
 

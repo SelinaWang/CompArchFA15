@@ -19,6 +19,9 @@ output reg          serialDataOut       // Positive edge synchronized
 );
 
     reg [width-1:0]      shiftregistermem;
+    initial begin
+	serialDataOut <= 0;
+    end
     always @(posedge clk) begin
       if (parallelLoad) begin
         shiftregistermem <= parallelDataIn;
@@ -26,7 +29,6 @@ output reg          serialDataOut       // Positive edge synchronized
       else if (peripheralClkEdge && (parallelLoad == 0)) begin
         shiftregistermem <= shiftregistermem << 1;
         shiftregistermem[0] <= serialDataIn;
-        $display("from sr: loading %b into the register", serialDataIn);
       end
 
       parallelDataOut <= shiftregistermem;

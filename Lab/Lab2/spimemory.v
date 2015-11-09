@@ -20,14 +20,14 @@ wire conditioned1;
 wire conditioned2;
 wire conditioned3;
 wire positiveedge1;
-wire positiveedge2;
+wire posSCLK;
 wire positveedge3;
 wire negativeedge1;
-wire negativeedge2;
+wire negSCLK;
 wire negativeedge3;
 wire sr_we;
 wire dm_we;
-wire [7:0] dout;
+wire [7:0] dataOut;
 wire addr_we;
 wire miso_buff;
 wire [7:0] parallelout;
@@ -38,13 +38,13 @@ wire miso_bufe;
 
 
 inputconditioner ic0(clk, mosi_pin, conditioned1, positiveedge1, negativeedge1);
-inputconditioner ic1(clk, sclk_pin, conditioned2, positiveedge2, negativeedge2);
+inputconditioner ic1(clk, sclk_pin, conditioned2, posSCLK, negSCLK);
 inputconditioner ic2(clk, cs_pin, conditioned3, positiveedge3, negativeedge3);
-shiftregister sr0(clk, positiveedge2, sr_we, dout, conditioned1, parallelout, serialout);
-finitestatemachine fsm(positiveedge2, conditioned3, parallelout[0], sr_we, dm_we, addr_we, miso_bufe);
+shiftregister sr0(clk, posSCLK, sr_we, dataOut, conditioned1, parallelout, serialout);
+finitestatemachine fsm(posSCLK, conditioned3, parallelout[0], sr_we, dm_we, addr_we, miso_bufe);
 addresslatch al(datamem_address, parallelout, addr_we, clk);
-datamemory dm(clk, dout, datamem_address[1 +: 7], dm_we, parallelout);
-dff df(dff_q, serialout, negativeedge2, clk);
+datamemory dm(clk, dataOut, datamem_address[1 +: 7], dm_we, parallelout);
+dff df(dff_q, serialout, negSCLK, clk);
 
 bufif1 misobuff (miso_pin, dff_q, miso_bufe);
 
