@@ -15,9 +15,9 @@ module datamemory
     input 		                clk,
     output reg [width-1:0]      dataOut,
     input [addresswidth-1:0]    address,
-    input                       writeEnable,
+    input                writeEnable,
     input [width-1:0]           dataIn
-)
+);
 
 
     reg [width-1:0] memory [depth-1:0];

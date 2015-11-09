@@ -11,22 +11,24 @@ module shiftregister
 (
 input               clk,                // FPGA Clock
 input               peripheralClkEdge,  // Edge indicator
-input               parallelLoad,       // 1 = Load shift reg with parallelDataIn
-input  [width-1:0]  parallelDataIn,     // Load shift reg in parallel
-input               serialDataIn,       // Load shift reg serially
+input               parallelLoad,       // 1 = Load shift reg with parallelDataIn //falling button
+input  [width-1:0]  parallelDataIn,     // Load shift reg in parallel  
+input               serialDataIn,       // Load shift reg serially  
 output reg[width-1:0] parallelDataOut,    // Shift reg data contents
 output reg          serialDataOut       // Positive edge synchronized
 );
 
     reg [width-1:0]      shiftregistermem;
     always @(posedge clk) begin
-      if (peripheralClkEdge) begin
-        shiftregistermem <= shiftregistermem << 1;
-        shiftregistermem[0] <= serialDataIn;
-      end
       if (parallelLoad) begin
         shiftregistermem <= parallelDataIn;
       end
+      else if (peripheralClkEdge && (parallelLoad == 0)) begin
+        shiftregistermem <= shiftregistermem << 1;
+        shiftregistermem[0] <= serialDataIn;
+        $display("from sr: loading %b into the register", serialDataIn);
+      end
+
       parallelDataOut <= shiftregistermem;
       serialDataOut <= shiftregistermem[width-1];
     end

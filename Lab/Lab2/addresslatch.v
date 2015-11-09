@@ -11,6 +11,7 @@ input			clk
     always @(posedge clk) begin
         if (ce) begin
             q = d;
+            $display("latch set: %b", q);
         end
     end
 
