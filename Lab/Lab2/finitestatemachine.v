@@ -3,7 +3,6 @@
 //------------------------------------------------------------------------
 
 module finitestatemachine
-#(parameter width = 8)
 (
 input               sclk,                // SLA Clock
 input               cs_pin,             // Chip Select pin
