@@ -22,12 +22,10 @@ output reg          miso_e       // MISO enable
         dm_we <= 0;
         a_le <= 0;
         miso_e <= 0;
-        $display("cs_pin high");
       end
       else begin
         case(state)
           0: begin
-            $display("case 0");
             sr_we <= 0;
             dm_we <= 0;
             a_le <= 1;
@@ -38,7 +36,6 @@ output reg          miso_e       // MISO enable
             end
           end
           1: begin
-            $display("case 1");
             sr_we <= 0;
             dm_we <= 0;
             miso_e <= 0;
@@ -52,7 +49,6 @@ output reg          miso_e       // MISO enable
             end
           end
           2: begin
-            $display("case 2");
             sr_we <= 0;
             dm_we <= 0;
             a_le <= 0;
@@ -60,7 +56,6 @@ output reg          miso_e       // MISO enable
             state <= 3;
           end
           3: begin
-            $display("case 3");
             dm_we <= 0;
             a_le <= 0;
             miso_e <= 0;
@@ -68,7 +63,6 @@ output reg          miso_e       // MISO enable
             state <= 4;
           end
           4: begin
-            $display("case 4");
             sr_we <= 0;
             dm_we <= 0;
             a_le <= 0;
@@ -79,7 +73,6 @@ output reg          miso_e       // MISO enable
             end
           end
           5: begin
-            $display("case 5");
             sr_we <= 0;
             dm_we <= 1;
             a_le <= 0;
@@ -90,7 +83,6 @@ output reg          miso_e       // MISO enable
             end
           end
           7: begin
-            $display("case 7");
             sr_we <= 0;
             dm_we <= 0;
             a_le <= 0;
