@@ -6,9 +6,11 @@ This bike light takes one input from a single button and returns one output to a
 
 ###Operational Modes###
 This bike light has four modes: Off, On, Blinking, and Dim (On at approximately 50% brightness):
-![four modes: Off, On, Blinking, and Dim](https://github.com/SelinaWang/CompArchFA15/blob/master/HW/Midterm/waveforms.PNG)
+![four modes: Off, On, Blinking, and Dim](https://github.com/SelinaWang/CompArchFA15/blob/master/HW/Midterm/waveforms.png)
+
 The modes are cycled through in the following fashion:
 ![Cycling through the four modes](https://github.com/SelinaWang/CompArchFA15/blob/master/HW/Midterm/FSM.PNG)
+
 The LED flashes at a frequency of 3Hz in blinking mode.
 
 
