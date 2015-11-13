@@ -16,4 +16,4 @@ The modes are cycled through in the following fashion:
 The LED flashes at a frequency of 3Hz in blinking mode.
 
 
-clk is a 32,768Hz (2^15) square wave to drive the clocked logic in the rest of the system. So 5 flip flops should be used for an Up Counter that gives out a 3Hz frequency for the blinking mode.
+clk is a 32,768Hz (2^15) square wave to drive the clocked logic in the rest of the system. Dimming: http://www.digikey.com/en/articles/techzone/2010/apr/how-to-dim-an-led
