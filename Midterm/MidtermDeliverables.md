@@ -39,6 +39,7 @@ Positive Edge Triggered D-Flip Flop | 13 | 2 | 26
 2 Input Exclusive NOR gate | 2 | 1 | 2
 2 Input AND gate | 3 | 1 | 3
 Buffer with Enable | 2 | 1 | 2
+
 Total GIE | 725
 
 
@@ -56,6 +57,7 @@ The finite state machine takes a 4 bit mode signal and outputs the corresponding
 Subcomponents | Cost Per | # Used | Total
 --------------|----------|--------|-------
 2 Input NOR gate | 2 | 2 | 4
+
 Total GIE | 4
 
 ###Frequency Divider###
@@ -71,6 +73,7 @@ The frequency divider takes in the high frequency clock signal and outputs a 4 H
 Subcomponents | Cost Per | # Used | Total
 --------------|----------|--------|-------
 Positive Edge triggered D-Flip Flop | 13 | 13 | 169
+
 Total GIE  | 169
 
 
