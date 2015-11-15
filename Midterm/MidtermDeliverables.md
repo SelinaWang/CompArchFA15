@@ -24,7 +24,7 @@ The block diagram shows a high-level view of the digital circuit. The signal fro
 
 ###Input Conditioner###
 ####Specification####
-The input conditioner debounces a noisy signal which has a button noise that decays within 1 second and gives out a smooth, stable signal.
+The input conditioner debounces a noisy signal which has a button noise that decays within 1 millisecond (33 clock cycles) and gives out a smooth, stable signal. 
 ####Inputs####
 1 bit noisy signal from button press
 ####Outputs####
@@ -49,6 +49,7 @@ The finite state machine takes a 4 bit mode signal and outputs the corresponding
 4 bit mode signal
 ####Outputs####
 1 bit SEL0
+
 1 bit SEL1
 ####Schematic####
 ![Finite State Machine](https://github.com/SelinaWang/CompArchFA15/blob/master/Midterm/Images/FSMSchematic.png)
