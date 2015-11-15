@@ -30,7 +30,7 @@ The input conditioner debounces a noisy signal which has a button noise that dec
 ####Outputs####
 1 bit stable signal to the 4 stage ring counter
 ####Schematic####
-![Input Conditioner](https://github.com/SelinaWang/CompArchFA15/blob/master/Midterm/Images/InputConditioner.PNG)
+![Input Conditioner](https://github.com/SelinaWang/CompArchFA15/blob/master/Midterm/Images/InputConditioner.png)
 ####Size####
 Subcomponents | Cost Per | # Used | Total
 --------------|----------|--------|-------
@@ -51,7 +51,7 @@ The finite state machine takes a 4 bit mode signal and outputs the corresponding
 1 bit SEL0
 1 bit SEL1
 ####Schematic####
-![Finite State Machine](https://github.com/SelinaWang/CompArchFA15/blob/master/Midterm/Images/FSMschematic.PNG)
+![Finite State Machine](https://github.com/SelinaWang/CompArchFA15/blob/master/Midterm/Images/FSMSchematic.PNG)
 ####Size####
 Subcomponents | Cost Per | # Used | Total
 --------------|----------|--------|-------
@@ -66,7 +66,7 @@ The frequency divider takes in the high frequency clock signal and outputs a 4 H
 ####Outputs####
 4 Hz square wave blink signal
 ####Schematic####
-![Frequency Divider](https://github.com/SelinaWang/CompArchFA15/blob/master/Midterm/Images/FrequencyDivider.PNG)
+![Frequency Divider](https://github.com/SelinaWang/CompArchFA15/blob/master/Midterm/Images/FrequencyDivider.png)
 ####Size####
 Subcomponents | Cost Per | # Used | Total
 --------------|----------|--------|-------
