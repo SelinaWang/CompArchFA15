@@ -39,7 +39,7 @@ Positive Edge Triggered D-Flip Flop | 13 | 2 | 26
 2 Input Exclusive NOR gate | 2 | 1 | 2
 2 Input AND gate | 3 | 1 | 3
 Buffer with Enable | 2 | 1 | 2
-Total GIE | | | 725
+Total GIE | 725
 
 
 ###Finite State Machine###
@@ -51,12 +51,12 @@ The finite state machine takes a 4 bit mode signal and outputs the corresponding
 1 bit SEL0
 1 bit SEL1
 ####Schematic####
-![Finite State Machine](https://github.com/SelinaWang/CompArchFA15/blob/master/Midterm/Images/FSMSchematic.PNG)
+![Finite State Machine](https://github.com/SelinaWang/CompArchFA15/blob/master/Midterm/Images/FSMSchematic.png)
 ####Size####
 Subcomponents | Cost Per | # Used | Total
 --------------|----------|--------|-------
 2 Input NOR gate | 2 | 2 | 4
-Total GIE | | | 4
+Total GIE | 4
 
 ###Frequency Divider###
 ####Specification####
@@ -71,10 +71,12 @@ The frequency divider takes in the high frequency clock signal and outputs a 4 H
 Subcomponents | Cost Per | # Used | Total
 --------------|----------|--------|-------
 Positive Edge triggered D-Flip Flop | 13 | 13 | 169
-Total GIE  | | | 169
+Total GIE  | 169
 
 
 ##References##
 I talked to ninja Radmer about dividing the frequency and he gave me the idea of using a frequency divider. Then I did some in-depth research on how to construct and use one.
+
 Frequency Divider: http://www.electronics-tutorials.ws/counter/count_1.html
+
 Dimming: http://www.digikey.com/en/articles/techzone/2010/apr/how-to-dim-an-led
